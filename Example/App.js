@@ -1,113 +1,42 @@
-import React from 'react';
-import {
-  Text,
-  View,
-  FlatList,
-  StyleSheet,
-  TouchableHighlight,
-} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { enableScreens } from 'react-native-screens';
+import * as React from 'react';
+import { Text, View, StyleSheet, Button } from 'react-native';
 
-import Stack from './stack';
-import NativeStack from './nativeStack';
-import Tabs from './tabs';
-import Navigation from './navigation';
-import NativeNavigation from './nativeNavigation';
-import NavigationTabsAndStack from './navigationTabsAndStack';
+import { NavigationContainer } from '@react-navigation/native';
+import { enableScreens, ScreenStack, Screen } from 'react-native-screens';
 
 enableScreens();
 
-const SCREENS = {
-  Stack: { Screen: Stack, title: 'Screen container based stack' },
-  NativeStack: { Screen: NativeStack, title: 'Native stack example' },
-  Tabs: { Screen: Tabs, title: 'Tabs example' },
-  NativeNavigation: {
-    Screen: NativeNavigation,
-    title: 'Native stack bindings for RNN',
-  },
-  Navigation: {
-    Screen: Navigation,
-    title: 'React Navigation with screen enabled',
-  },
-  NavigationTabsAndStack: {
-    Screen: NavigationTabsAndStack,
-    title: 'React Navigation Tabs + Stack',
-  },
-};
-
-const MainScreen = ({ navigation }) => {
-  const data = Object.keys(SCREENS).map((key) => ({ key }));
+export default function App() {
+  const [state, setState] = React.useState(0);
   return (
-    <FlatList
-      style={styles.list}
-      data={data}
-      ItemSeparatorComponent={ItemSeparator}
-      renderItem={(props) => (
-        <MainScreenItem
-          {...props}
-          onPressItem={({ key }) => navigation.navigate(key)}
-        />
+    <ScreenStack style={styles.container}>
+      <Screen style={styles.container}>
+        <Text>Yolo</Text>
+        <Button title="move" onPress={() => setState(2)} />
+      </Screen>
+      {state === 2 && (
+        <Screen style={styles.container} stackPresentation="modal">
+          <Text>Yolo</Text>
+          <Button title="move" onPress={() => setState(0)} />
+          <View style={styles.bottom} />
+        </Screen>
       )}
-    />
+    </ScreenStack>
   );
 }
-
-const ItemSeparator = () => <View style={styles.separator} />;
-
-const MainScreenItem = (props) => {
-  const _onPress = () => props.onPressItem(props.item);
-  const { key } = props.item;
-  return (
-    <TouchableHighlight onPress={_onPress}>
-      <View style={styles.button}>
-        <Text style={styles.buttonText}>{SCREENS[key].title || key}</Text>
-      </View>
-    </TouchableHighlight>
-  );
-}
-
-const MainScreenStack = createStackNavigator();
-
-const ExampleApp = () => (
-  <NavigationContainer>
-    <MainScreenStack.Navigator>
-      <MainScreenStack.Screen name="Main" options={{title: '📱 React Native Screens Examples'}} component={MainScreen} />
-      {Object.keys(SCREENS).map((name) => {
-        const { Screen, title } = SCREENS[name];
-        return (
-          <MainScreenStack.Screen
-            key={name}
-            name={name}
-            component={Screen}
-            options={{ title }}
-          />
-        );
-      })}
-    </MainScreenStack.Navigator>
-  </NavigationContainer>
-);
 
 const styles = StyleSheet.create({
-  list: {
-    backgroundColor: '#EFEFF4',
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    paddingTop: 100,
+    backgroundColor: 'white',
   },
-  separator: {
-    height: 1,
-    backgroundColor: '#DBDBE0',
-  },
-  buttonText: {
-    backgroundColor: 'transparent',
-  },
-  button: {
-    flex: 1,
-    height: 60,
-    padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+  bottom: {
+    position: 'absolute',
+    bottom: 10,
+    left: 0,
+    width: 100,
+    height: 100,
+    backgroundColor: 'blue',
   },
 });
-
-export default ExampleApp;
